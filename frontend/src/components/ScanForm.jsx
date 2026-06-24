@@ -11,7 +11,7 @@ function ScanForm({ onScan, isScanning }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
       <input
         type="text"
         value={target}
