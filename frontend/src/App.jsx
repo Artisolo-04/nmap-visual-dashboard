@@ -1,3 +1,4 @@
+import BootScreen from './components/BootScreen';
 import { useState, useEffect, useCallback } from 'react';
 import { ShieldCheck, AlertCircle } from 'lucide-react';
 import api from './api';
@@ -6,10 +7,13 @@ import ResultsTable from './components/ResultsTable';
 import ScanHistory from './components/ScanHistory';
 
 function App() {
+  
+  const [isBooting, setIsBooting] = useState(true);
   const [scans, setScans] = useState([]);
   const [activeScan, setActiveScan] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState(null);
+
 
   const loadScans = useCallback(async () => {
     try {
@@ -23,6 +27,10 @@ function App() {
   useEffect(() => {
     loadScans();
   }, [loadScans]);
+
+  if (isBooting) {
+    return <BootScreen onComplete={() => setIsBooting(false)} />;
+  }
 
   async function handleScan(target) {
     setIsScanning(true);
