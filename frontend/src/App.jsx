@@ -7,7 +7,7 @@ import ResultsTable from './components/ResultsTable';
 import ScanHistory from './components/ScanHistory';
 
 function App() {
-  
+
   const [isBooting, setIsBooting] = useState(true);
   const [scans, setScans] = useState([]);
   const [activeScan, setActiveScan] = useState(null);
@@ -63,7 +63,7 @@ function App() {
             <ShieldCheck className="text-green-400" size={26} />
             <div>
               <h1 className="text-lg font-semibold text-zinc-100">Nmap Dashboard</h1>
-              <p className="text-sm text-zinc-500">Run scans, read results, keep a history.</p>
+              <p className="text-sm text-zinc-500">Run scans , read results , keep a history .</p>
             </div>
           </header>
 

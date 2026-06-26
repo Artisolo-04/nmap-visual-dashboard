@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const pool = require('../db/pool');
 
 const { parseNmapXML } = require('../utils/nmapParser');
+const { calculateRisk } = require('../utils/riskScorer');
 
 const SAFE_TARGET_REGEX = /^[a-zA-Z0-9.\-:]+$/;
 
@@ -28,12 +29,15 @@ async function runScan(req, res) {
 
       const status = parsed.state === 'up' ? 'completed' : 'host_unreachable';
 
+      const risk = status === 'completed' ? calculateRisk(parsed) : { score: null, grade: null };
+
       const result = await pool.query(
 
-        ` INSERT INTO scans ( target , status , raw_result )
-          VALUES ($1, $2, $3)
-          RETURNING id , target , status , raw_result , scanned_at ` ,
-          [target , status , parsed]
+        ` INSERT INTO scans ( target , status , raw_result , risk_score , risk_grade )
+          VALUES ($1 , $2 , $3 , $4 , $5)
+          RETURNING id , target , status , raw_result , risk_score , risk_grade , scanned_at ` ,
+          [target , status , parsed , risk.score , risk.grade]
+
       );
 
       res.status(201).json(result.rows[0]);
@@ -46,7 +50,7 @@ async function runScan(req, res) {
 
 async function getScans(req, res) {
   const result = await pool.query(
-    ' SELECT id , target , status , raw_result , scanned_at FROM scans ORDER BY scanned_at DESC LIMIT 50 '
+    ' SELECT id , target , status , raw_result , risk_score , risk_grade , scanned_at FROM scans ORDER BY scanned_at DESC LIMIT 50 '
   );
   res.json(result.rows);
 }

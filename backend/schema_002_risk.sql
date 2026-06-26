@@ -1,0 +1,2 @@
+ALTER TABLE scans ADD COLUMN risk_score INTEGER;
+ALTER TABLE scans ADD COLUMN risk_grade VARCHAR(2);

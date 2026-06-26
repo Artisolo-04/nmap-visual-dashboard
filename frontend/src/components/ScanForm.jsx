@@ -16,7 +16,7 @@ function ScanForm({ onScan, isScanning }) {
         type="text"
         value={target}
         onChange={(e) => setTarget(e.target.value)}
-        placeholder="localhost, 192.168.1.1..."
+        placeholder="localhost , 192.168.1.1..."
         disabled={isScanning}
         className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-4 py-2 text-green-400 placeholder:text-zinc-500 outline-none focus:border-green-500"
       />
