@@ -75,7 +75,6 @@ function ResultsTable({ scan }) {
   return (
     <div className="h-[480px] flex flex-col rounded-xl border border-zinc-800 bg-zinc-950/60 overflow-hidden">
 
-      {/* Header — same height as history header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900/40">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-zinc-100 truncate leading-tight">{scan.target}</p>
@@ -92,7 +91,6 @@ function ResultsTable({ scan }) {
         </div>
       </div>
 
-      {/* Stats row */}
       <div className="grid grid-cols-3 divide-x divide-zinc-800/80 border-b border-zinc-800 bg-zinc-900/20">
         <StatCard value={openPorts.length} label="Open"    accent="text-green-400" />
         <StatCard value={ports.length}      label="Scanned" accent="text-zinc-100"  />
@@ -102,7 +100,6 @@ function ResultsTable({ scan }) {
         />
       </div>
 
-      {/* Table */}
       <div className="flex-1 overflow-auto">
         {ports.length === 0 ? (
           <p className="px-5 py-8 text-center text-zinc-500 text-sm">No ports found.</p>
