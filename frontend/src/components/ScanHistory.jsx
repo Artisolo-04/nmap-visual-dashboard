@@ -15,8 +15,6 @@ const SCAN_TYPE_ICONS = {
   full: Layers,
 };
 
-// Each type gets its OWN accent color when active, so the filter row itself
-// teaches you the color language at a glance, same idea as the grade badges
 const TYPE_FILTER_OPTIONS = [
   { type: 'quick',    label: 'Quick',    icon: Zap,        active: 'text-green-400 bg-green-500/15 border-green-500/40' },
   { type: 'detailed', label: 'Detailed', icon: ScanSearch, active: 'text-cyan-400 bg-cyan-500/15 border-cyan-500/40'   },
@@ -37,7 +35,7 @@ function ScanHistory({ scans, onSelect, onCompare }) {
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilters, setTypeFilters] = useState([]); // empty = show every type
+  const [typeFilters, setTypeFilters] = useState([]);
   const [riskyOnly, setRiskyOnly] = useState(false);
 
   const anchorScan = selectedIds.length > 0 ? scans.find((s) => s.id === selectedIds[0]) : null;
@@ -50,10 +48,10 @@ function ScanHistory({ scans, onSelect, onCompare }) {
   });
 
   function isSelectable(scan) {
-    if (!anchorScan) return true;
-    if (scan.id === anchorScan.id) return true;
-    return scan.scan_type === anchorScan.scan_type;
-  }
+  if (!anchorScan) return true;
+  if (scan.id === anchorScan.id) return true;
+  return scan.target === anchorScan.target && scan.scan_type === anchorScan.scan_type;
+}
 
   function toggleCompareMode() {
     setIsCompareMode((prev) => !prev);
@@ -115,7 +113,6 @@ function ScanHistory({ scans, onSelect, onCompare }) {
         </button>
       </div>
 
-      {/* Search + filter icons share one compact row to save space */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-800/60 bg-zinc-950/30">
         <Search size={13} className="text-zinc-600 shrink-0" />
         <input
@@ -199,7 +196,7 @@ function ScanHistory({ scans, onSelect, onCompare }) {
                     <p className="text-[11px] text-zinc-500 mt-0.5 truncate">
                       {new Date(scan.scanned_at).toLocaleString(undefined, {
                         dateStyle: 'short',
-                        timeStyle: 'short', // dropped seconds — shorter text, less likely to overflow
+                        timeStyle: 'short',
                       }).replace(', ', ' - ')}
                       <span className="text-zinc-700 mx-1">·</span>
                       <span className={openCount > 0 ? 'text-zinc-400' : 'text-zinc-600'}>
