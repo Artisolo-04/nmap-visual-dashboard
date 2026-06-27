@@ -1,10 +1,11 @@
 import BootScreen from './components/BootScreen';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ShieldCheck, AlertCircle } from 'lucide-react';
 import api from './api';
 import ScanForm from './components/ScanForm';
 import ResultsTable from './components/ResultsTable';
 import ScanHistory from './components/ScanHistory';
+import ScanningModal from './components/ScanningModal';
 
 function App() {
 
@@ -13,6 +14,11 @@ function App() {
   const [activeScan, setActiveScan] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState(null);
+  const [runningScanType, setRunningScanType] = useState('quick');
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [isFinishingScan, setIsFinishingScan] = useState(false);
+  const  modalShownRef = useRef(false);
+  const  delayTimerRef = useRef(null);
 
 
   const loadScans = useCallback(async () => {
@@ -34,22 +40,46 @@ function App() {
 
   async function handleScan(target, scanType) {
     setIsScanning(true);
+    setRunningScanType(scanType);
     setError(null);
+    modalShownRef.current = false;
+
+    delayTimerRef.current = setTimeout(() => {
+      modalShownRef.current = true;
+      setShowScanModal(true);
+    }, 400);
+
     try {
       const res = await api.post('/scans', { target, scanType });
+      clearTimeout(delayTimerRef.current);
+
+      if (modalShownRef.current) {
+        setIsFinishingScan(true);
+      } else {
+        setIsScanning(false);
+      }
+
       setActiveScan(res.data);
       await loadScans();
     } catch (err) {
+      clearTimeout(delayTimerRef.current);
       setError(err.response?.data?.error || 'Something went wrong.');
-    } finally {
+      setShowScanModal(false);
+      setIsFinishingScan(false);
       setIsScanning(false);
     }
+  }
+
+  function handleModalFinish() {
+    setShowScanModal(false);
+    setIsFinishingScan(false);
+    setIsScanning(false);
   }
 
   return (
     <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
 
-      <div className="w-full max-w-5xl rounded-xl border border-zinc-800 bg-[#0d1311] shadow-[0_0_60px_rgba(34,197,94,0.08)] overflow-hidden">
+      <div className="relative w-full max-w-5xl rounded-xl border border-zinc-800 bg-[#0d1311] shadow-[0_0_60px_rgba(34,197,94,0.08)] overflow-hidden">
 
         <div className="flex items-center gap-2 border-b border-zinc-800 bg-zinc-950/80 px-4 py-3">
           <span className="h-3 w-3 rounded-full bg-red-500/70" />
@@ -83,6 +113,13 @@ function App() {
             <ScanHistory scans={scans} onSelect={setActiveScan} />
           </section>
         </div>
+        {showScanModal && (
+          <ScanningModal
+            scanType={runningScanType}
+            isFinishing={isFinishingScan}
+            onFinish={handleModalFinish}
+          />
+        )}
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ function ScanForm({ onScan, isScanning }) {
         disabled={isScanning || !target.trim()}
         className="bg-green-600 hover:bg-green-500 disabled:opacity-40 disabled:cursor-not-allowed text-black font-semibold px-5 py-2 rounded transition-colors"
       >
-        {isScanning ? 'Scanning...' : 'Run scan'}
+        Run scan
       </button>
     </form>
   );
