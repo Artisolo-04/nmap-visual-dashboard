@@ -6,6 +6,7 @@ import ScanForm from './components/ScanForm';
 import ResultsTable from './components/ResultsTable';
 import ScanHistory from './components/ScanHistory';
 import ScanningModal from './components/ScanningModal';
+import ComparisonReport from './components/ComparisonReport';
 
 function App() {
 
@@ -17,9 +18,36 @@ function App() {
   const [runningScanType, setRunningScanType] = useState('quick');
   const [showScanModal, setShowScanModal] = useState(false);
   const [isFinishingScan, setIsFinishingScan] = useState(false);
+
   const  modalShownRef = useRef(false);
   const  delayTimerRef = useRef(null);
 
+  const [comparisonData, setComparisonData] = useState(null);
+  const [isComparing, setIsComparing] = useState(false);
+
+  function handleModalFinish() {
+    setShowScanModal(false);
+    setIsFinishingScan(false);
+    setIsScanning(false);
+  }
+
+  async function handleCompare(scanA, scanB) {
+    setIsComparing(true);
+    setError(null);
+
+    const [olderScan, newerScan] = scanA.scanned_at < scanB.scanned_at ? [scanA, scanB] : [scanB, scanA];
+
+    try {
+      const res = await api.get('/scans/compare', {
+        params: { from: olderScan.id, to: newerScan.id },
+      });
+      setComparisonData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to compare scans.');
+    } finally {
+      setIsComparing(false);
+    }
+  }
 
   const loadScans = useCallback(async () => {
     try {
@@ -110,7 +138,7 @@ function App() {
 
           <section className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
             <ResultsTable scan={activeScan} />
-            <ScanHistory scans={scans} onSelect={setActiveScan} />
+            <ScanHistory scans={scans} onSelect={setActiveScan} onCompare={handleCompare} />
           </section>
         </div>
         {showScanModal && (
@@ -119,6 +147,9 @@ function App() {
             isFinishing={isFinishingScan}
             onFinish={handleModalFinish}
           />
+        )}
+        {comparisonData && (
+          <ComparisonReport data={comparisonData} onClose={() => setComparisonData(null)} />
         )}
       </div>
     </div>
