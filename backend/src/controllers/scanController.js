@@ -5,6 +5,7 @@ const pool = require('../db/pool');
 const { parseNmapXML } = require('../utils/nmapParser');
 const { calculateRisk } = require('../utils/riskScorer');
 const { getScanConfig } = require('../utils/scanTypes');
+const { diffScans } = require('../utils/diffScans');
 
 const SAFE_TARGET_REGEX = /^[a-zA-Z0-9.\-:]+$/;
 
@@ -68,4 +69,31 @@ async function getScanById(req, res) {
   res.json(result.rows[0]);
 }
 
-module.exports = { runScan, getScans, getScanById };
+async function compareScans(req, res) {
+  const { from, to } = req.query;
+
+  if (!from || !to) {
+    return res.status(400).json({ error: 'Both "from" and "to" scan IDs are required.' });
+  }
+
+  try {
+    const fromResult = await pool.query('SELECT * FROM scans WHERE id = $1', [from]);
+    const toResult = await pool.query('SELECT * FROM scans WHERE id = $1', [to]);
+
+    if (fromResult.rows.length === 0 || toResult.rows.length === 0) {
+      return res.status(404).json({ error: 'One or both scans were not found.' });
+    }
+
+    const diff = diffScans(fromResult.rows[0], toResult.rows[0]);
+
+    res.json({
+      from: fromResult.rows[0],
+      to: toResult.rows[0],
+      diff,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to compare scans', details: err.message });
+  }
+}
+
+module.exports = { runScan, getScans, getScanById, compareScans };
