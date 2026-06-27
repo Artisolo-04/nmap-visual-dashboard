@@ -1,4 +1,4 @@
-import { History, Wifi } from 'lucide-react';
+import { History, Wifi, ChevronRight, Zap, ScanSearch, Layers} from 'lucide-react';
 
 const gradeConfig = {
   A: { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30' },
@@ -6,6 +6,12 @@ const gradeConfig = {
   C: { bg: 'bg-yellow-500/15',  text: 'text-yellow-400',  border: 'border-yellow-500/30'  },
   D: { bg: 'bg-orange-500/15',  text: 'text-orange-400',  border: 'border-orange-500/30'  },
   F: { bg: 'bg-red-500/15',     text: 'text-red-400',     border: 'border-red-500/30'     },
+};
+
+const SCAN_TYPE_ICONS = {
+  quick: Zap,
+  detailed: ScanSearch,
+  full: Layers,
 };
 
 function GradeBadge({ grade }) {
@@ -40,7 +46,9 @@ function ScanHistory({ scans, onSelect }) {
       ) : (
         <ul className="flex-1 overflow-y-auto divide-y divide-zinc-800/50">
           {scans.map((scan) => {
+
             const openCount = scan.raw_result?.ports?.filter((p) => p.state === 'open').length ?? 0;
+            const TypeIcon = SCAN_TYPE_ICONS[scan.scan_type] || Zap;
 
             return (
               <li key={scan.id}>
@@ -65,7 +73,10 @@ function ScanHistory({ scans, onSelect }) {
                       </span>
                     </p>
                   </div>
-                  <GradeBadge grade={scan.risk_grade} />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <TypeIcon size={14} className="text-zinc-500" />
+                    <GradeBadge grade={scan.risk_grade} />
+                  </div>
                 </button>
               </li>
             );

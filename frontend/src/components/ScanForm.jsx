@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import ScanTypeSelect from './ScanTypeSelect';
 
 function ScanForm({ onScan, isScanning }) {
 
   const [target, setTarget] = useState('');
+  const [scanType, setScanType] = useState('quick');
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!target.trim() || isScanning) return;
-    onScan(target.trim());
+    onScan(target.trim(), scanType);
   }
 
   return (
@@ -20,6 +22,8 @@ function ScanForm({ onScan, isScanning }) {
         disabled={isScanning}
         className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-4 py-2 text-green-400 placeholder:text-zinc-500 outline-none focus:border-green-500"
       />
+
+      <ScanTypeSelect value={scanType} onChange={setScanType} disabled={isScanning} />
 
       <button
         type="submit"

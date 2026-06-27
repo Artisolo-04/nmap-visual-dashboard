@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Zap, ScanSearch, Layers } from 'lucide-react';
 import RiskBadge from './RiskBadge';
 
 function StatusPill({ status }) {
@@ -23,6 +23,30 @@ function PortDot({ state }) {
         ? 'bg-green-400 shadow-[0_0_6px_2px_rgba(74,222,128,0.6)]'
         : 'bg-zinc-600'
     }`} />
+  );
+}
+
+const SCAN_TYPE_ICONS = {
+  quick: Zap,
+  detailed: ScanSearch,
+  full: Layers,
+};
+
+const SCAN_TYPE_LABELS = {
+  quick: 'Quick',
+  detailed: 'Detailed',
+  full: 'Full',
+};
+
+function ScanTypeBadge({ scanType }) {
+  const Icon = SCAN_TYPE_ICONS[scanType] || Zap;
+  const label = SCAN_TYPE_LABELS[scanType] || 'Quick';
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border bg-zinc-800/60 text-zinc-300 border-zinc-700">
+      <Icon size={12} />
+      {label}
+    </span>
   );
 }
 
@@ -86,6 +110,7 @@ function ResultsTable({ scan }) {
             }</p>
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-3">
+          <ScanTypeBadge scanType={scan.scan_type} />
           <StatusPill status={scan.status} />
           <RiskBadge grade={scan.risk_grade} score={scan.risk_score} />
         </div>
@@ -111,6 +136,7 @@ function ResultsTable({ scan }) {
                 <th className="hidden sm:table-cell px-5 py-2.5 font-medium">Proto</th>
                 <th className="px-5 py-2.5 font-medium">State</th>
                 <th className="px-5 py-2.5 font-medium">Service</th>
+                <th className="hidden md:table-cell px-3 sm:px-5 py-2">Version</th>
               </tr>
             </thead>
             <tbody>
@@ -135,6 +161,9 @@ function ResultsTable({ scan }) {
                   </td>
                   <td className="px-5 py-2.5">
                     <ServiceTag name={p.service} />
+                  </td>
+                  <td className="hidden md:table-cell px-3 sm:px-5 py-2.5 text-zinc-500 text-xs">
+                    {[p.product, p.version].filter(Boolean).join(' ') || '—'}
                   </td>
                 </tr>
               ))}

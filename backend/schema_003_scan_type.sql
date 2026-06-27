@@ -1,0 +1,1 @@
+ALTER TABLE scans ADD COLUMN scan_type VARCHAR(20) NOT NULL DEFAULT 'quick';

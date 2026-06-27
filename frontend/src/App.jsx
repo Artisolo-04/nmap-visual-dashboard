@@ -32,11 +32,11 @@ function App() {
     return <BootScreen onComplete={() => setIsBooting(false)} />;
   }
 
-  async function handleScan(target) {
+  async function handleScan(target, scanType) {
     setIsScanning(true);
     setError(null);
     try {
-      const res = await api.post('/scans', { target });
+      const res = await api.post('/scans', { target, scanType });
       setActiveScan(res.data);
       await loadScans();
     } catch (err) {
